@@ -1,24 +1,53 @@
+import '../../stylesheets/Color.scss'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 import StarRating from './StarRating'
-import '../../stylesheets/Color.scss'
+import TimeAgo from './TimeAgo'
+import FaTrash from 'react-icons/lib/fa/trash-o'
+import { rateColor, removeColor } from '../actions'
 
-const Color = ({ title, color, rating = 0, onRemove = f => f, onRate = f => f }) => (
-  <section className="color">
-    <h1>{title}</h1>
-    <button onClick={onRemove}>X</button>
-    <div className="color" style={{ backgroundColor: color }} />
-    <div>
-      <StarRating starsSelected={rating} onRate={onRate} />
-    </div>
-  </section>
-)
+class Color extends Component {
+
+    render() {
+        const { id, title, color, rating, timestamp } = this.props
+        const { store } = this.context
+        return (
+            <section className="color" style={this.style}>
+                <h1 ref="title">{title}</h1>
+                <button onClick={() =>
+                    store.dispatch(removeColor(id))
+                }>
+                    <FaTrash />
+                </button>
+                <div className="color"
+                     style={{ backgroundColor: color }}>
+                </div>
+                <TimeAgo timestamp={timestamp} />
+                <div>
+                    <StarRating starsSelected={rating}
+                                onRate={rating =>
+                                    store.dispatch(rateColor(id, rating))
+                                } />
+                </div>
+            </section>
+        )
+    }
+
+}
+
+Color.contextTypes = {
+    store: PropTypes.object
+}
 
 Color.propTypes = {
-  title: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  rating: PropTypes.number,
-  onRemove: PropTypes.func,
-  onRate: PropTypes.func,
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    rating: PropTypes.number
+}
+
+Color.defaultProps = {
+    rating: 0
 }
 
 export default Color
